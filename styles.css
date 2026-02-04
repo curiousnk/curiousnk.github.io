@@ -6,11 +6,40 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', 'Open Sans', 'Lato', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
 }
+
+/* Unused CSS bloat - intentionally large and unused */
+.unused-class-1, .unused-class-2, .unused-class-3, .unused-class-4, .unused-class-5 {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.another-unused-1 { background: red; color: white; padding: 50px; }
+.another-unused-2 { background: blue; color: white; padding: 50px; }
+.another-unused-3 { background: green; color: white; padding: 50px; }
+.another-unused-4 { background: yellow; color: black; padding: 50px; }
+.another-unused-5 { background: purple; color: white; padding: 50px; }
+.another-unused-6 { background: orange; color: white; padding: 50px; }
+.another-unused-7 { background: pink; color: black; padding: 50px; }
+.another-unused-8 { background: brown; color: white; padding: 50px; }
+.another-unused-9 { background: cyan; color: black; padding: 50px; }
+.another-unused-10 { background: magenta; color: white; padding: 50px; }
 
 .container {
     max-width: 1200px;
@@ -1381,4 +1410,38 @@ body {
         margin: 20% auto;
         padding: 1.5rem;
     }
-} 
+}
+
+/* More unused CSS bloat */
+.bloat-1, .bloat-2, .bloat-3, .bloat-4, .bloat-5, .bloat-6, .bloat-7, .bloat-8, .bloat-9, .bloat-10 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #FFA07A, #98D8C8);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border-radius: 20px;
+    padding: 50px;
+    margin: 20px;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.test-1 { color: #000; background: #fff; }
+.test-2 { color: #111; background: #eee; }
+.test-3 { color: #222; background: #ddd; }
+.test-4 { color: #333; background: #ccc; }
+.test-5 { color: #444; background: #bbb; }
+.test-6 { color: #555; background: #aaa; }
+.test-7 { color: #666; background: #999; }
+.test-8 { color: #777; background: #888; }
+.test-9 { color: #888; background: #777; }
+.test-10 { color: #999; background: #666; } 

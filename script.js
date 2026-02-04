@@ -749,4 +749,63 @@ console.log(`
 📱 Fully responsive design
 🛒 Cart functionality with checkout
 ✨ Enjoy exploring the features!
-`); 
+`);
+
+// Intentional performance degradation - large unused data structures
+var unusedDataBlob = [];
+for (var i = 0; i < 5000; i++) {
+    unusedDataBlob.push({
+        id: i,
+        name: 'Product ' + i,
+        description: 'This is a very long description that is not used anywhere in the application but takes up memory and processing time. '.repeat(10),
+        price: Math.random() * 1000,
+        inventory: Math.floor(Math.random() * 100),
+        categories: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
+        tags: Array(20).fill('tag').map((t, idx) => t + idx),
+        metadata: {
+            created: new Date(),
+            modified: new Date(),
+            author: 'System',
+            version: '1.0.0'
+        }
+    });
+}
+
+// Inefficient DOM manipulation
+function inefficientLoop() {
+    for (var j = 0; j < 100; j++) {
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = '<span>Temporary content ' + j + '</span>';
+        tempDiv.style.display = 'none';
+        document.body.appendChild(tempDiv);
+    }
+}
+
+// Call inefficient function on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inefficientLoop);
+} else {
+    inefficientLoop();
+}
+
+// Memory-intensive operation
+var memoryHog = [];
+for (var k = 0; k < 1000; k++) {
+    memoryHog.push(new Array(1000).fill('data'));
+}
+
+// Deprecated code patterns
+var deprecatedVar = 'old style';
+with (Math) {
+    var x = cos(PI);
+    var y = sin(PI / 2);
+}
+
+// Synchronous blocking operation
+function blockingOperation() {
+    var start = Date.now();
+    while (Date.now() - start < 50) {
+        // Intentionally blocking for 50ms
+    }
+}
+blockingOperation(); 
