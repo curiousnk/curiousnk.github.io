@@ -1,0 +1,222 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #333;
+    font-size: 28px;
+}
+
+.user-selection {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.user-selection label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#userDropdown {
+    padding: 8px;
+    font-size: 14px;
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+.current-user {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.actions {
+    margin-bottom: 20px;
+}
+
+.reload-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.reload-btn:hover {
+    background-color: #0056b3;
+}
+
+.for-you-section {
+    margin-bottom: 30px;
+}
+
+.for-you-section h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.offers-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+    flex: 1;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.offers-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.carousel-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.carousel-btn:hover {
+    background-color: #0056b3;
+}
+
+.carousel-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.offer-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 0 0 280px;
+    min-width: 280px;
+}
+
+.offer-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+
+.offer-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.offer-card .category {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.offer-card .description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.offer-card .buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.offer-card button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.select-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.select-btn:hover {
+    background-color: #218838;
+}
+
+.dismiss-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.dismiss-btn:hover {
+    background-color: #c82333;
+}
+
+.log-section {
+    margin-top: 30px;
+}
+
+.log-section h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.log-panel {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.log-panel:empty::before {
+    content: "No interactions yet...";
+    color: #666;
+}
