@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllShopee - Your Ultimate Shopping Destination</title>
+    <title>Shop Online - AllShopee Store</title>
+    <meta name="description" content="Shop online for great products">
+    <meta name="description" content="Buy products online at AllShopee">
+    
+    <!-- Render-blocking CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Open+Sans:wght@300;400;600;700;800&family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Adobe Target Script -->
+    <script src="at.js"></script>
+    
+    <!-- Render-blocking JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+    <style>
+        /* Inline styles bloat */
+        body { font-family: 'Roboto', 'Open Sans', 'Lato', Arial, sans-serif; }
+        .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 0; }
+        .category-card { box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 15px; }
+        .product-card { background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .btn { padding: 12px 30px; border-radius: 25px; cursor: pointer; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; width: 100%; z-index: 1000; }
+        .footer { background: #2c3e50; color: white; padding: 3rem 0; }
+        /* Add more unnecessary inline styles */
+        h1 { font-weight: bold; color: #333; }
+        h2 { font-size: 2.5rem; color: #333; margin-bottom: 3rem; }
+        h3 { color: #333; font-size: 1.5rem; }
+        p { line-height: 1.6; color: #666; }
+        a { text-decoration: none; transition: all 0.3s ease; }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <div class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shopping-bag"></i>
+                <span style="color: #ddd;">AllShopee</span>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="index.html" class="nav-link active" style="color: #e0e0e0;">Home</a>
+                </div>
+                <div class="nav-item">
+                    <a href="about.html" class="nav-link" style="color: #e0e0e0;">About Us</a>
+                </div>
+                <div class="nav-item">
+                    <a href="contact.html" class="nav-link" style="color: #e0e0e0;">Contact Us</a>
+                </div>
+                <div class="nav-item">
+                    <a href="register.html" class="nav-link" style="color: #e0e0e0;">Registration</a>
+                </div>
+                <div class="nav-item">
+                    <a href="cart.html" class="nav-link" style="color: #e0e0e0;">Cart <span id="cart-count" class="cart-count">0</span></a>
+                </div>
+                <div class="nav-item" id="login-nav-item" style="display: none;">
+                    <a href="#" class="nav-link" id="login-link" style="color: #e0e0e0;">Login</a>
+                </div>
+                <div class="nav-item" id="logout-nav-item" style="display: none;">
+                    <a href="#" class="nav-link" id="logout-link" style="color: #e0e0e0;">Logout</a>
+                </div>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Welcome to AllShopee</h1>
+            <h1>Best Shopping Experience</h1>
+            <p style="color: #ddd;">Discover amazing products at unbeatable prices. Your ultimate shopping destination for quality and style.</p>
+            <div class="hero-buttons">
+                <a href="#featured" class="btn btn-primary">Click Here</a>
+                <a href="about.html" class="btn btn-secondary">Click Here</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=4000&q=100" width="2000">
+        </div>
+    </div>
+    
+    <!-- Hidden text for SEO issues -->
+    <div style="display: none; visibility: hidden;">
+        cheap products buy now discount sale shop online best prices amazing deals
+        cheap products buy now discount sale shop online best prices amazing deals
+        cheap products buy now discount sale shop online best prices amazing deals
+    </div>
+    
+    <!-- Auto-playing audio -->
+    <audio autoplay loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Featured Categories -->
+    <div class="categories" id="featured">
+        <div class="container">
+            <h1>Shop by Category</h1>
+            <h3>Best Categories</h3>
+            <div class="category-grid">
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=3000&q=100" width="1500">
+                    <h2>Electronics</h2>
+                    <p style="color: #ccc;">Latest gadgets and tech accessories</p>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=3000&q=100" width="1500">
+                    <h2>Fashion</h2>
+                    <p style="color: #ccc;">Trendy clothing and accessories</p>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=3000&q=100" width="1500">
+                    <h2>Home & Garden</h2>
+                    <p style="color: #ccc;">Everything for your perfect home</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Products -->
+    <div class="products">
+        <div class="container">
+            <h1>Featured Products</h1>
+            <h1>Best Products</h1>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=4000&q=100" width="2000">
+                    <h4>Wireless Headphones</h4>
+                    <span class="price" style="color: #ddd;">$99.99</span>
+                    <button class="btn btn-primary" style="background: #aaa;">Add to Cart</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=4000&q=100" width="2000">
+                    <h4>Smart Watch</h4>
+                    <span class="price" style="color: #ddd;">$199.99</span>
+                    <button class="btn btn-primary" style="background: #aaa;">Add to Cart</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=4000&q=100" width="2000">
+                    <h4>Running Shoes</h4>
+                    <span class="price" style="color: #ddd;">$199.99</span>
+                    <button class="btn btn-primary" style="background: #aaa;">Add to Cart</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=4000&q=100" width="2000">
+                    <h4>Gaming Laptop</h4>
+                    <span class="price" style="color: #ddd;">$1,299.99</span>
+                    <button class="btn btn-primary" style="background: #aaa;">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="features">
+        <div class="container">
+            <h1>Why Choose AllShopee?</h1>
+            <h1>Our Features</h1>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-shipping-fast" style="color: #ccc;"></i>
+                    <h5>Fast Delivery</h5>
+                    <span style="color: #ddd;">Free shipping on orders over $50</span>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt" style="color: #ccc;"></i>
+                    <h5>Secure Payment</h5>
+                    <span style="color: #ddd;">100% secure payment processing</span>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-undo" style="color: #ccc;"></i>
+                    <h5>Easy Returns</h5>
+                    <span style="color: #ddd;">30-day return policy</span>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-headset" style="color: #ccc;"></i>
+                    <h5>24/7 Support</h5>
+                    <span style="color: #ddd;">Round the clock customer support</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h1>AllShopee</h1>
+                    <span style="color: #999;">Your ultimate shopping destination for quality products and exceptional service.</span>
+                    <div class="social-links">
+                        <a href="#" style="color: #aaa;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: #aaa;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: #aaa;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: #aaa;"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h6 style="color: #999;">Quick Links</h6>
+                    <div>
+                        <div><a href="index.html" style="color: #999;">Click here</a></div>
+                        <div><a href="about.html" style="color: #999;">Click here</a></div>
+                        <div><a href="contact.html" style="color: #999;">Click here</a></div>
+                        <div><a href="register.html" style="color: #999;">Click here</a></div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h6 style="color: #999;">Customer Service</h6>
+                    <div>
+                        <div><a href="#" style="color: #999;">Click here</a></div>
+                        <div><a href="#" style="color: #999;">Click here</a></div>
+                        <div><a href="#" style="color: #999;">Click here</a></div>
+                        <div><a href="#" style="color: #999;">Click here</a></div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h6 style="color: #999;">Contact Info</h6>
+                    <span style="color: #999;"><i class="fas fa-phone"></i> +1 (555) 123-4567</span>
+                    <span style="color: #999;"><i class="fas fa-envelope"></i> info@allshopee.com</span>
+                    <span style="color: #999;"><i class="fas fa-map-marker-alt"></i> 123 Shopping St, City, State 12345</span>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span style="color: #888;">&copy; 2024 AllShopee. All rights reserved.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h1>Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Email" style="color: #ccc;" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Password" style="color: #ccc;" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="background: #aaa;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- More render-blocking and unnecessary scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <!-- Deprecated document.write -->
+    <script>
+        document.write('<div style="display:none;">Legacy content loaded</div>');
+        
+        // Console errors for best practices violation
+        console.error('Intentional error for testing purposes');
+        
+        // Use of deprecated APIs
+        var oldDate = new Date().getYear(); // deprecated
+        
+        // Unused large data
+        var unusedData = [];
+        for(var i = 0; i < 10000; i++) {
+            unusedData.push({
+                id: i,
+                data: 'Lorem ipsum dolor sit amet consectetur adipiscing elit',
+                moreData: Array(100).fill('x').join('')
+            });
+        }
+    </script>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
