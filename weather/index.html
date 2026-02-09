@@ -143,7 +143,7 @@
     let currentScript = null;
     let currentScriptElement = null;
 
-    function loadScript(scriptName) {
+    async function loadScript(scriptName) {
       // Remove previous script if exists
       if (currentScriptElement) {
         currentScriptElement.remove();
@@ -156,13 +156,25 @@
       if (offerContainer) offerContainer.innerHTML = "";
       if (weatherStatus) weatherStatus.textContent = "Detecting weather...";
 
-      // Load new script
-      const script = document.createElement("script");
-      script.src = scriptName;
-      script.id = "demoScript";
-      document.body.appendChild(script);
-      currentScript = scriptName;
-      currentScriptElement = script;
+      // Fetch script content and wrap in IIFE to avoid variable conflicts
+      try {
+        const response = await fetch(scriptName);
+        const scriptContent = await response.text();
+        
+        // Wrap script in IIFE to isolate scope
+        const wrappedScript = `(function() { ${scriptContent} })();`;
+        
+        // Execute wrapped script
+        const script = document.createElement("script");
+        script.id = "demoScript";
+        script.textContent = wrappedScript;
+        document.body.appendChild(script);
+        currentScript = scriptName;
+        currentScriptElement = script;
+      } catch (error) {
+        console.error(`Failed to load ${scriptName}:`, error);
+        if (weatherStatus) weatherStatus.textContent = `Error loading ${scriptName}`;
+      }
     }
 
     // Initialize with default (ranking formula)
