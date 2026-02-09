@@ -25,7 +25,8 @@ function sendWeatherDataToAEP() {
     fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`)
       .then(res => res.json())
       .then(data => {
-        const temp = Math.round(data.main.temp);
+        //const temp = Math.round(data.main.temp);
+           const temp = 89;
         const condition = data.weather[0].main;
         const city = data.name;
         const humidity = Math.round(data.main.humidity);
