@@ -26,7 +26,7 @@ function sendWeatherDataToAEP() {
       .then(res => res.json())
       .then(data => {
         //const temp = Math.round(data.main.temp);
-           const temp = 89;
+           const temp = 65;
         const condition = data.weather[0].main;
         const city = data.name;
         const humidity = Math.round(data.main.humidity);
