@@ -51,10 +51,42 @@ navigator.geolocation.getCurrentPosition(pos => {
           return;
         }
 
+        // DELTA: Extract tokens from subPropositions (base64 encoded) - build token map by index
+        const tokensByIndex = [];
+        (response.propositions || []).forEach(proposition => {
+          try {
+            if (proposition.scopeDetails?.characteristics?.subPropositions) {
+              const decoded = atob(proposition.scopeDetails.characteristics.subPropositions);
+              const subProps = JSON.parse(decoded);
+              if (Array.isArray(subProps) && subProps.length > 0) {
+                subProps.forEach(subProp => {
+                  if (subProp.items && Array.isArray(subProp.items)) {
+                    subProp.items.forEach(subItem => {
+                      if (subItem.token) {
+                        tokensByIndex.push(subItem.token);
+                      }
+                    });
+                  }
+                });
+              }
+            }
+          } catch (e) {
+            console.warn("Failed to decode subPropositions:", e);
+          }
+        });
+
         // DELTA: Added impressionItems array to track offers for impression events
         const impressionItems = [];
 
-        allOffers.forEach(item => {
+        allOffers.forEach((item, itemIndex) => {
+          // DELTA: Extract offerId from item and token from subPropositions by index
+          const offerId = item.id;
+          const trackingToken = tokensByIndex[itemIndex] || item.token;
+
+          if (offerId && trackingToken) {
+            impressionItems.push({ id: offerId, token: trackingToken });
+          }
+
           const decoded = decodeHtml(item.data?.content || "");
           const tempDiv = document.createElement("div");
           tempDiv.innerHTML = decoded;
@@ -62,14 +94,6 @@ navigator.geolocation.getCurrentPosition(pos => {
           // DELTA: Enhanced offer rendering with tracking token extraction
           [...tempDiv.children].forEach(child => {
             if (child.classList.contains("offer-item")) {
-              // DELTA: Extract offerId and trackingToken for tracking
-              const offerId = child.getAttribute("data-offer-id");
-              const trackingToken = child.getAttribute("data-tracking-token");
-
-              if (offerId && trackingToken) {
-                impressionItems.push({ id: offerId, token: trackingToken });
-              }
-
               offerDiv.appendChild(child);
 
               // DELTA: Added click tracking for offer interactions
