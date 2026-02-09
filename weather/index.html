@@ -25,6 +25,40 @@
       text-align: center;
     }
 
+    .demo-selector {
+      margin: 1rem auto;
+      max-width: 800px;
+      padding: 0 1rem;
+    }
+
+    .demo-selector label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .demo-selector select {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    .demo-selector select:hover {
+      border-color: #1e88e5;
+    }
+
+    .demo-selector select:focus {
+      outline: none;
+      border-color: #1e88e5;
+      box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+    }
+
     .container {
       max-width: 800px;
       margin: 2rem auto;
@@ -82,6 +116,14 @@
     <p>Personalized deals based on your local weather</p>
   </header>
 
+  <div class="demo-selector">
+    <label for="demoMode">Select Demo Mode:</label>
+    <select id="demoMode">
+      <option value="ranking">Ranking Formula (AJO)</option>
+      <option value="ai">AI Model</option>
+    </select>
+  </div>
+
   <div class="container">
     <div id="weatherStatus">Detecting weather...</div>
 
@@ -96,8 +138,48 @@
   </footer>
   <script src="https://assets.adobedtm.com/0fdf44e62125/e83d4391416e/launch-bad7a7174ca2-development.min.js" async></script>
 
-  
-<script src="app.js"></script>
+  <script>
+    // Script loader to switch between demos
+    let currentScript = null;
+    let currentScriptElement = null;
+
+    function loadScript(scriptName) {
+      // Remove previous script if exists
+      if (currentScriptElement) {
+        currentScriptElement.remove();
+        currentScriptElement = null;
+      }
+
+      // Clear offer container and reset status
+      const offerContainer = document.getElementById("offerContainer");
+      const weatherStatus = document.getElementById("weatherStatus");
+      if (offerContainer) offerContainer.innerHTML = "";
+      if (weatherStatus) weatherStatus.textContent = "Detecting weather...";
+
+      // Load new script
+      const script = document.createElement("script");
+      script.src = scriptName;
+      script.id = "demoScript";
+      document.body.appendChild(script);
+      currentScript = scriptName;
+      currentScriptElement = script;
+    }
+
+    // Initialize with default (ranking formula)
+    const demoMode = document.getElementById("demoMode");
+    demoMode.addEventListener("change", function() {
+      if (this.value === "ranking") {
+        loadScript("app.js");
+      } else if (this.value === "ai") {
+        loadScript("appwithaimodel.js");
+      }
+    });
+
+    // Load default script after a short delay to ensure Alloy is ready
+    setTimeout(() => {
+      loadScript("app.js");
+    }, 1000);
+  </script>
 
 </body>
 </html>
