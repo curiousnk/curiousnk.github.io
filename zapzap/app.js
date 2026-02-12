@@ -5,15 +5,20 @@
   const profileInitial = document.getElementById("profileInitial");
   const profileBtn = document.getElementById("profileBtn");
   const usageCard = document.getElementById("usageCard");
-  const carousel = document.getElementById("carousel");
+  const carouselAI = document.getElementById("carouselAI");
+  const carouselAJO = document.getElementById("carouselAJO");
   const modalOverlay = document.getElementById("modalOverlay");
   const modalTitle = document.getElementById("modalTitle");
   const modalBody = document.getElementById("modalBody");
   const modalClose = document.getElementById("modalClose");
-  const btnPrev = document.querySelector(".carousel-btn-prev");
-  const btnNext = document.querySelector(".carousel-btn-next");
 
   let currentUser = null;
+
+  function getOffersInOrder(user, orderKey) {
+    var order = user[orderKey];
+    if (!order || !order.length) return user.offers.slice();
+    return order.map(function (id) { return user.offers.find(function (o) { return o.id === id; }); }).filter(Boolean);
+  }
 
   function getGreeting() {
     const h = new Date().getHours();
@@ -83,44 +88,48 @@
     return offer.image || "images/offers/" + (offer.theme || "personal") + ".svg";
   }
 
-  function renderCarousel(user) {
-    carousel.innerHTML = user.offers
-      .map((offer) => {
-        var theme = getOfferTheme(offer);
-        var meta = OFFER_THEMES[theme];
-        var label = meta ? meta.label : "For you";
-        var imgSrc = getOfferImage(offer);
-        return (
-          '<article class="offer-card" data-offer-id="' + offer.id + '">' +
-          '<img class="offer-card-image" src="' + imgSrc + '" alt="" loading="lazy" />' +
-          '<div class="offer-card-body">' +
-          '<p class="offer-card-category">' + label + '</p>' +
-          '<h3>' + offer.title + '</h3>' +
-          '<p class="offer-desc">' + offer.shortDesc + '</p>' +
-          '<div class="offer-actions">' +
-          '<button type="button" class="btn-show-more" data-offer-id="' + offer.id + '">Show more</button>' +
-          '</div>' +
-          '</div>' +
-          '</article>'
-        );
-      })
-      .join("");
+  function buildOfferCardHTML(offer) {
+    var theme = getOfferTheme(offer);
+    var meta = OFFER_THEMES[theme];
+    var label = meta ? meta.label : "For you";
+    var imgSrc = getOfferImage(offer);
+    return (
+      '<article class="offer-card" data-offer-id="' + offer.id + '">' +
+      '<img class="offer-card-image" src="' + imgSrc + '" alt="" loading="lazy" />' +
+      '<div class="offer-card-body">' +
+      '<p class="offer-card-category">' + label + '</p>' +
+      '<h3>' + offer.title + '</h3>' +
+      '<p class="offer-desc">' + offer.shortDesc + '</p>' +
+      '<div class="offer-actions">' +
+      '<button type="button" class="btn-show-more" data-offer-id="' + offer.id + '">Show more</button>' +
+      '</div>' +
+      '</div>' +
+      '</article>'
+    );
+  }
 
-    carousel.scrollLeft = 0;
-    updateCarouselButtons();
-
-    carousel.querySelectorAll(".btn-show-more").forEach((btn) => {
+  function renderCarousel(carouselEl, offers, user) {
+    if (!carouselEl) return;
+    carouselEl.innerHTML = offers.map(buildOfferCardHTML).join("");
+    carouselEl.scrollLeft = 0;
+    updateCarouselButtons(carouselEl);
+    carouselEl.querySelectorAll(".btn-show-more").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        const offer = user.offers.find((o) => o.id === this.dataset.offerId);
+        var offer = user.offers.find(function (o) { return o.id === btn.dataset.offerId; });
         if (offer) openModal(offer);
       });
     });
   }
 
-  function updateCarouselButtons() {
-    const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-    btnPrev.disabled = maxScroll <= 0 || carousel.scrollLeft <= 0;
-    btnNext.disabled = maxScroll <= 0 || carousel.scrollLeft >= maxScroll - 1;
+  function updateCarouselButtons(carouselEl) {
+    if (!carouselEl) return;
+    var wrap = carouselEl.closest(".carousel-wrap");
+    if (!wrap) return;
+    var prevBtn = wrap.querySelector(".carousel-btn-prev");
+    var nextBtn = wrap.querySelector(".carousel-btn-next");
+    var maxScroll = carouselEl.scrollWidth - carouselEl.clientWidth;
+    if (prevBtn) prevBtn.disabled = maxScroll <= 0 || carouselEl.scrollLeft <= 0;
+    if (nextBtn) nextBtn.disabled = maxScroll <= 0 || carouselEl.scrollLeft >= maxScroll - 1;
   }
 
   function openModal(offer) {
@@ -135,11 +144,12 @@
   }
 
   function switchUser(userId) {
-    currentUser = ZAPZAP_USERS.find((u) => u.id === userId);
+    currentUser = ZAPZAP_USERS.find(function (u) { return u.id === userId; });
     if (!currentUser) return;
     updateHero(currentUser);
     renderUsageCard(currentUser);
-    renderCarousel(currentUser);
+    renderCarousel(carouselAI, getOffersInOrder(currentUser, "aiOrder"), currentUser);
+    renderCarousel(carouselAJO, getOffersInOrder(currentUser, "ajoOrder"), currentUser);
   }
 
   profileBtn.addEventListener("click", function () {
@@ -148,16 +158,18 @@
   });
 
   userSelect.addEventListener("change", function () {
-    switchUser(this.value);
+    switchUser(Number(this.value));
   });
 
-  btnPrev.addEventListener("click", function () {
-    carousel.scrollBy({ left: -300, behavior: "smooth" });
+  document.querySelectorAll(".carousel-wrap").forEach(function (wrap) {
+    var car = wrap.querySelector(".carousel");
+    if (!car) return;
+    var prevBtn = wrap.querySelector(".carousel-btn-prev");
+    var nextBtn = wrap.querySelector(".carousel-btn-next");
+    if (prevBtn) prevBtn.addEventListener("click", function () { car.scrollBy({ left: -300, behavior: "smooth" }); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { car.scrollBy({ left: 300, behavior: "smooth" }); });
+    car.addEventListener("scroll", function () { updateCarouselButtons(car); });
   });
-  btnNext.addEventListener("click", function () {
-    carousel.scrollBy({ left: 300, behavior: "smooth" });
-  });
-  carousel.addEventListener("scroll", updateCarouselButtons);
 
   modalClose.addEventListener("click", closeModal);
   modalOverlay.addEventListener("click", function (e) {
