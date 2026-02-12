@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank you - AllShopee</title>
+    <script src="at.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shopping-bag"></i>
+                <a href="index.html" class="nav-logo-link">AllShopee</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="products.html" class="nav-link">Products</a></li>
+                <li class="nav-item"><a href="cart.html" class="nav-link">Cart <span id="cart-count" class="cart-count">0</span></a></li>
+                <li class="nav-item" id="login-nav-item" style="display: none;"><a href="#" class="nav-link" id="login-link">Login</a></li>
+                <li class="nav-item" id="logout-nav-item" style="display: none;"><a href="#" class="nav-link" id="logout-link">Logout</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="top-banner" class="top-banner"></div>
+
+    <section class="thankyou-section">
+        <div class="container container-narrow">
+            <h1>Thank you for placing your order</h1>
+            <p class="thankyou-order-label">Order number</p>
+            <p id="thankyou-order-number" class="thankyou-order-number">—</p>
+            <a href="index.html" class="btn btn-primary">Continue shopping</a>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        (function() {
+            var m = /[?&]order=([^&]+)/.exec(window.location.search);
+            var orderId = m ? decodeURIComponent(m[1]) : '—';
+            document.getElementById('thankyou-order-number').textContent = orderId;
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - AllShopee</title>
+    <script src="at.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shopping-bag"></i>
+                <a href="index.html" class="nav-logo-link">AllShopee</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="products.html" class="nav-link active">Products</a></li>
+                <li class="nav-item"><a href="cart.html" class="nav-link">Cart <span id="cart-count" class="cart-count">0</span></a></li>
+                <li class="nav-item" id="login-nav-item" style="display: none;"><a href="#" class="nav-link" id="login-link">Login</a></li>
+                <li class="nav-item" id="logout-nav-item" style="display: none;"><a href="#" class="nav-link" id="logout-link">Logout</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="top-banner" class="top-banner"></div>
+
+    <section class="hero hero-small">
+        <div class="container">
+            <h1>Products</h1>
+            <p>Shop by category</p>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="container">
+            <div class="category-filters">
+                <button type="button" class="btn btn-secondary filter-btn active" data-category="all">All</button>
+                <button type="button" class="btn btn-secondary filter-btn" data-category="Electronics">Electronics</button>
+                <button type="button" class="btn btn-secondary filter-btn" data-category="Fashion">Fashion</button>
+                <button type="button" class="btn btn-secondary filter-btn" data-category="Home & Garden">Home & Garden</button>
+            </div>
+            <div class="product-grid" id="product-grid">
+                <div class="product-card" data-category="Electronics">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" alt="Wireless Headphones">
+                    <h3>Wireless Headphones</h3>
+                    <p class="price">$99.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Electronics">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" alt="Smart Watch">
+                    <h3>Smart Watch</h3>
+                    <p class="price">$199.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Fashion">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" alt="Running Shoes">
+                    <h3>Running Shoes</h3>
+                    <p class="price">$129.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Electronics">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&q=80" alt="Gaming Laptop">
+                    <h3>Gaming Laptop</h3>
+                    <p class="price">$1,299.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Electronics">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" alt="Wireless Earbuds">
+                    <h3>Wireless Earbuds</h3>
+                    <p class="price">$79.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Electronics">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" alt="Fitness Tracker">
+                    <h3>Fitness Tracker</h3>
+                    <p class="price">$149.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Fashion">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" alt="Sports Bag">
+                    <h3>Sports Bag</h3>
+                    <p class="price">$89.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Electronics">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&q=80" alt="Gaming Mouse">
+                    <h3>Gaming Mouse</h3>
+                    <p class="price">$69.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+                <div class="product-card" data-category="Home & Garden">
+                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80" alt="Desk Lamp">
+                    <h3>Desk Lamp</h3>
+                    <p class="price">$44.99</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        (function() {
+            var grid = document.getElementById('product-grid');
+            var cards = grid ? grid.querySelectorAll('.product-card') : [];
+            document.querySelectorAll('.filter-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    var cat = this.getAttribute('data-category');
+                    cards.forEach(function(card) {
+                        var show = cat === 'all' || card.getAttribute('data-category') === cat;
+                        card.style.display = show ? '' : 'none';
+                    });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

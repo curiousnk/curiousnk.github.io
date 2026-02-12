@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZapZap – My account</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Hero: gradient, greeting, user, profile switcher -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <p class="hero-greeting" id="heroGreeting">Good evening</p>
+        <p class="hero-user" id="heroUser">Alex M.</p>
+      </div>
+      <div class="hero-right">
+        <div class="profile-wrap">
+          <button type="button" class="profile-btn" id="profileBtn" aria-label="Switch user" aria-haspopup="listbox" aria-expanded="false">
+            <span class="profile-initial" id="profileInitial">A</span>
+          </button>
+          <select id="userSelect" class="profile-select" aria-label="Switch user">
+            <!-- filled by JS -->
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Quick actions -->
+    <nav class="quick-actions" aria-label="Quick actions">
+      <a href="#" class="quick-action">
+        <span class="quick-action-icon">🎁</span>
+        <span>Share data</span>
+      </a>
+      <a href="#" class="quick-action">
+        <span class="quick-action-icon">📶</span>
+        <span>My network</span>
+      </a>
+      <a href="#" class="quick-action">
+        <span class="quick-action-icon">📄</span>
+        <span>Invoices</span>
+      </a>
+    </nav>
+
+    <!-- Usage: one card like reference -->
+    <section class="usage-section">
+      <div class="usage-section-head">
+        <h2 class="usage-section-title">Usage</h2>
+        <a href="#" class="usage-section-link">Show all →</a>
+      </div>
+      <div class="usage-card" id="usageCard">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+    <!-- Entertainment / Offers carousel with images -->
+    <section class="offers-section">
+      <h2 class="section-title section-title-accent">Entertainment</h2>
+      <p class="section-subtitle">Personalized offers for you</p>
+      <div class="carousel-wrap">
+        <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Previous">‹</button>
+        <div class="carousel" id="carousel">
+          <!-- filled by JS -->
+        </div>
+        <button type="button" class="carousel-btn carousel-btn-next" aria-label="Next">›</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle">Offer details</h2>
+        <button type="button" class="modal-close" id="modalClose" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - AllShopee</title>
+    <script src="at.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shopping-bag"></i>
+                <a href="index.html" class="nav-logo-link">AllShopee</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="products.html" class="nav-link">Products</a></li>
+                <li class="nav-item"><a href="cart.html" class="nav-link">Cart <span id="cart-count" class="cart-count">0</span></a></li>
+                <li class="nav-item" id="login-nav-item" style="display: none;"><a href="#" class="nav-link" id="login-link">Login</a></li>
+                <li class="nav-item" id="logout-nav-item" style="display: none;"><a href="#" class="nav-link" id="logout-link">Logout</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="top-banner" class="top-banner"></div>
+
+    <section class="checkout-section">
+        <div class="container container-narrow">
+            <h1>Checkout</h1>
+            <div id="checkout-summary" class="checkout-summary">
+                <p id="checkout-subtotal">Subtotal: $0.00</p>
+                <p id="checkout-shipping">Shipping: $0.00</p>
+                <p id="checkout-tax">Tax: $0.00</p>
+                <p id="checkout-total" class="checkout-total">Total: $0.00</p>
+            </div>
+            <button type="button" id="place-order-btn" class="btn btn-primary">Place order</button>
+            <a href="cart.html" class="btn btn-secondary btn-back">Back to cart</a>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        (function() {
+            var cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
+            if (cart.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+            var subtotal = 0;
+            cart.forEach(function(item) {
+                subtotal += parseFloat(item.price.replace('$', '')) * item.quantity;
+            });
+            var shipping = subtotal > 50 ? 0 : 9.99;
+            var tax = subtotal * 0.08;
+            var total = subtotal + shipping + tax;
+            document.getElementById('checkout-subtotal').textContent = 'Subtotal: $' + subtotal.toFixed(2);
+            document.getElementById('checkout-shipping').textContent = 'Shipping: ' + (shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2));
+            document.getElementById('checkout-tax').textContent = 'Tax: $' + tax.toFixed(2);
+            document.getElementById('checkout-total').textContent = 'Total: $' + total.toFixed(2);
+
+            document.getElementById('place-order-btn').addEventListener('click', function() {
+                if (typeof clearAdobeECIDCookies === 'function') clearAdobeECIDCookies();
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('currentUser');
+                sessionStorage.removeItem('cart');
+                var orderId = '' + Math.floor(1e9 + Math.random() * 9e9);
+                window.location.href = 'thank-you.html?order=' + orderId;
+            });
+        })();
+    </script>
+</body>
+</html>
