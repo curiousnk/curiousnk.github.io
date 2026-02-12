@@ -56,9 +56,9 @@
 
   function renderUsageCard(user) {
     const u = user.usage;
-    const planLabel = user.plan.indexOf("Unlimited") !== -1
+    const planLabel = user.planType.indexOf("Unlimited") !== -1
       ? "Unlimited Calls and SMS"
-      : user.plan + " • Calls & SMS";
+      : user.planType + " • Calls & SMS";
     usageCard.innerHTML =
       '<div class="usage-card-icon">📱</div>' +
       '<div class="usage-card-main">' +

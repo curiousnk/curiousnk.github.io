@@ -3,7 +3,7 @@ const ZAPZAP_USERS = [
     id: 10001,
     name: "Alex Morgan",
     usage: { dataGB: 12.4, minutes: 340, sms: 28 },
-    plan: "Unlimited Plus",
+    planType: "Unlimited Plus",
     subscriptions: ["Spotify Premium", "Cloud Storage 50GB"],
     offers: [
       { id: "voor-jou-1", title: "Voor Jou", theme: "personal", image: "images/offers/personal.svg", shortDesc: "Tailored for your usage", fullDescription: "A personalized bundle based on your data and calling patterns. Includes extra data rollover and weekend unlimited calls." },
@@ -19,7 +19,7 @@ const ZAPZAP_USERS = [
     id: 10002,
     name: "Jordan Lee",
     usage: { dataGB: 2.1, minutes: 890, sms: 120 },
-    plan: "Talk More 500",
+    planType: "Talk More 500",
     subscriptions: ["None"],
     offers: [
       { id: "tve-2", title: "TV & Entertainment", theme: "tv", image: "images/offers/tv.svg", shortDesc: "Stream your favorites", fullDescription: "Add TV and streaming to your plan. Access 50+ channels and premium apps." },
@@ -34,7 +34,7 @@ const ZAPZAP_USERS = [
     id: 10003,
     name: "Sam Chen",
     usage: { dataGB: 45.2, minutes: 45, sms: 12 },
-    plan: "Data Max",
+    planType: "Data Max",
     subscriptions: ["Spotify Premium", "YouTube Premium", "Cloud Storage 200GB"],
     offers: [
       { id: "voor-jou-3", title: "Voor Jou", theme: "personal", image: "images/offers/personal.svg", shortDesc: "Data-first experience", fullDescription: "Optimized for heavy data users. Priority speed and unlimited social data." },
@@ -49,7 +49,7 @@ const ZAPZAP_USERS = [
     id: 10004,
     name: "Riley Davis",
     usage: { dataGB: 8.0, minutes: 180, sms: 450 },
-    plan: "Value Bundle",
+    planType: "Value Bundle",
     subscriptions: ["Cloud Storage 50GB"],
     offers: [
       { id: "sms-pack-4", title: "SMS Pack", theme: "sms", image: "images/offers/sms.svg", shortDesc: "More texts, one price", fullDescription: "Unlimited SMS to all national numbers. Great for your messaging habits." },
@@ -64,7 +64,7 @@ const ZAPZAP_USERS = [
     id: 10005,
     name: "Casey Brown",
     usage: { dataGB: 22.0, minutes: 520, sms: 85 },
-    plan: "All-in-One Pro",
+    planType: "All-in-One Pro",
     subscriptions: ["Spotify Premium", "TV Basic", "Secure Net"],
     offers: [
       { id: "tve-5", title: "TV & Entertainment Upgrade", theme: "tv", image: "images/offers/tv.svg", shortDesc: "Go premium", fullDescription: "Upgrade from TV Basic to full TV & Entertainment. More channels and 4K." },
