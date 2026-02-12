@@ -74,8 +74,23 @@
       '<div class="usage-card-days">30 days</div>';
   }
 
-  function offerImageUrl(offerId) {
-    return "https://picsum.photos/seed/" + encodeURIComponent(offerId) + "/400/220";
+  var OFFER_THEMES = {
+    tv: { label: "Entertainment" },
+    roam: { label: "Roaming" },
+    secure: { label: "Security" },
+    family: { label: "Family" },
+    personal: { label: "For you" },
+    data: { label: "Data" },
+    sms: { label: "Messaging" }
+  };
+
+  function getOfferTheme(offer) {
+    var t = offer.theme || "personal";
+    return OFFER_THEMES[t] ? t : "personal";
+  }
+
+  function getOfferImage(offer) {
+    return offer.image || "images/offers/" + (offer.theme || "personal") + ".svg";
   }
 
   function renderCarousel(user) {
@@ -83,12 +98,15 @@
     const visibleOffers = user.offers.filter((o) => !dismissed.has(o.id));
     carousel.innerHTML = visibleOffers
       .map((offer) => {
-        const imgUrl = offer.imageUrl || offerImageUrl(offer.id);
+        var theme = getOfferTheme(offer);
+        var meta = OFFER_THEMES[theme];
+        var label = meta ? meta.label : "For you";
+        var imgSrc = getOfferImage(offer);
         return (
           '<article class="offer-card" data-offer-id="' + offer.id + '">' +
-          '<img class="offer-card-image" src="' + imgUrl + '" alt="" loading="lazy" />' +
+          '<img class="offer-card-image" src="' + imgSrc + '" alt="" loading="lazy" />' +
           '<div class="offer-card-body">' +
-          '<p class="offer-card-category">Entertainment</p>' +
+          '<p class="offer-card-category">' + label + '</p>' +
           '<h3>' + offer.title + '</h3>' +
           '<p class="offer-desc">' + offer.shortDesc + '</p>' +
           '<div class="offer-actions">' +
