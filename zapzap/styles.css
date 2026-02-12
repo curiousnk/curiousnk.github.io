@@ -351,10 +351,6 @@ body {
   transform: translateY(-2px);
 }
 
-.offer-card.dismissed {
-  display: none;
-}
-
 .offer-card-image {
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -419,15 +415,6 @@ body {
 .btn-show-more:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
-}
-
-.btn-dismiss {
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.btn-dismiss:hover {
-  background: rgba(255, 255, 255, 0.18);
 }
 
 /* Modal */

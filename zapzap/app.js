@@ -14,16 +14,6 @@
   const btnNext = document.querySelector(".carousel-btn-next");
 
   let currentUser = null;
-  const dismissedByUser = {};
-
-  function getDismissed(userId) {
-    return dismissedByUser[userId] || new Set();
-  }
-
-  function setDismissed(userId, offerId) {
-    if (!dismissedByUser[userId]) dismissedByUser[userId] = new Set();
-    dismissedByUser[userId].add(offerId);
-  }
 
   function getGreeting() {
     const h = new Date().getHours();
@@ -94,9 +84,7 @@
   }
 
   function renderCarousel(user) {
-    const dismissed = getDismissed(user.id);
-    const visibleOffers = user.offers.filter((o) => !dismissed.has(o.id));
-    carousel.innerHTML = visibleOffers
+    carousel.innerHTML = user.offers
       .map((offer) => {
         var theme = getOfferTheme(offer);
         var meta = OFFER_THEMES[theme];
@@ -111,7 +99,6 @@
           '<p class="offer-desc">' + offer.shortDesc + '</p>' +
           '<div class="offer-actions">' +
           '<button type="button" class="btn-show-more" data-offer-id="' + offer.id + '">Show more</button>' +
-          '<button type="button" class="btn-dismiss" data-offer-id="' + offer.id + '">Dismiss</button>' +
           '</div>' +
           '</div>' +
           '</article>'
@@ -126,14 +113,6 @@
       btn.addEventListener("click", function () {
         const offer = user.offers.find((o) => o.id === this.dataset.offerId);
         if (offer) openModal(offer);
-      });
-    });
-    carousel.querySelectorAll(".btn-dismiss").forEach((btn) => {
-      btn.addEventListener("click", function () {
-        const offerId = this.dataset.offerId;
-        setDismissed(user.id, offerId);
-        const card = carousel.querySelector("[data-offer-id=\"" + offerId + "\"]");
-        if (card) card.classList.add("dismissed");
       });
     });
   }
