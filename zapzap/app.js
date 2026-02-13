@@ -12,7 +12,75 @@
   const modalBody = document.getElementById("modalBody");
   const modalClose = document.getElementById("modalClose");
 
+  // Must match the surface name configured in AJO for the ranking-formula offer (where we render AJO carousel)
+  const AJO_SURFACE = "web://curiousnk.github.io/zapzap/index.html#carouselAJO";
+
   let currentUser = null;
+
+  function waitForAlloy(callback, interval, retries) {
+    interval = interval || 100;
+    retries = retries || 50;
+    if (typeof alloy === "function") {
+      callback();
+    } else if (retries > 0) {
+      setTimeout(function () { waitForAlloy(callback, interval, retries - 1); }, interval);
+    } else {
+      console.error("Alloy is not available.");
+    }
+  }
+
+  function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html || "";
+    return txt.value;
+  }
+
+  function requestAJOOffers(user) {
+    if (!carouselAJO || typeof alloy !== "function") return;
+    carouselAJO.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+    var telcocoId = String(user.id);
+
+    alloy("sendEvent", {
+      renderDecisions: false,
+      personalization: {
+        surfaces: [AJO_SURFACE]
+      },
+      xdm: {
+        eventType: "decisioning.request",
+        _psc: {
+          planType: user.planType
+        },
+        identityMap: {
+          TELECOID: [{ id: telcocoId }]
+        }
+      }
+    }).then(function (response) {
+      var allOffers = [];
+      (response.propositions || []).forEach(function (p) {
+        allOffers = allOffers.concat(p.items || []);
+      });
+      if (!allOffers.length) {
+        carouselAJO.innerHTML = "<p class=\"carousel-message\">No offer returned.</p>";
+        updateCarouselButtons(carouselAJO);
+        return;
+      }
+      carouselAJO.innerHTML = "";
+      allOffers.forEach(function (item) {
+        var decoded = decodeHtml(item.data && item.data.content);
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = decoded;
+        [].slice.call(tempDiv.children).forEach(function (child) {
+          carouselAJO.appendChild(child);
+        });
+      });
+      carouselAJO.scrollLeft = 0;
+      updateCarouselButtons(carouselAJO);
+    }).catch(function (err) {
+      console.error("AJO personalization failed:", err);
+      carouselAJO.innerHTML = "<p class=\"carousel-message\">No offer returned.</p>";
+      updateCarouselButtons(carouselAJO);
+    });
+  }
 
   function getOffersInOrder(user, orderKey) {
     var order = user[orderKey];
@@ -149,7 +217,11 @@
     updateHero(currentUser);
     renderUsageCard(currentUser);
     renderCarousel(carouselAI, getOffersInOrder(currentUser, "aiOrder"), currentUser);
-    renderCarousel(carouselAJO, getOffersInOrder(currentUser, "ajoOrder"), currentUser);
+    if (typeof alloy === "function") {
+      requestAJOOffers(currentUser);
+    } else {
+      if (carouselAJO) carouselAJO.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+    }
   }
 
   profileBtn.addEventListener("click", function () {
@@ -181,4 +253,7 @@
 
   renderUserOptions();
   switchUser(ZAPZAP_USERS[0].id);
+  waitForAlloy(function () {
+    if (currentUser) requestAJOOffers(currentUser);
+  });
 })();

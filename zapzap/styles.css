@@ -314,6 +314,15 @@ body {
   min-height: 260px;
 }
 
+.carousel-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 .carousel::-webkit-scrollbar {
   height: 8px;
 }
