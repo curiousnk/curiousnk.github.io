@@ -94,7 +94,7 @@
     var label = meta ? meta.label : "For you";
     var imgSrc = getOfferImage(offer);
     return (
-      '<article class="offer-card" data-offer-id="' + offer.id + '">' +
+      '<div class="offer-card" data-offer-id="' + offer.id + '">' +
       '<img class="offer-card-image" src="' + imgSrc + '" alt="" loading="lazy" />' +
       '<div class="offer-card-body">' +
       '<p class="offer-card-category">' + label + '</p>' +
@@ -104,7 +104,7 @@
       '<button type="button" class="btn-show-more" data-offer-id="' + offer.id + '">Show more</button>' +
       '</div>' +
       '</div>' +
-      '</article>'
+      '</div>'
     );
   }
 
