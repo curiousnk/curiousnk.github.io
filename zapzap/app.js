@@ -48,6 +48,7 @@
       xdm: {
         eventType: "decisioning.request",
         _psc: {
+          telcocoId: telcocoId,
           planType: user.planType
         },
         identityMap: {
