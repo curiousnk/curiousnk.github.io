@@ -3,7 +3,7 @@ const ZAPZAP_USERS = [
     id: 10001,
     name: "Alex Morgan",
     usage: { dataGB: 12.4, minutes: 340, sms: 28 },
-    planType: "Unlimited Plus",
+    planType: "individual",
     subscriptions: ["Spotify Premium", "Cloud Storage 50GB"],
     offers: [
       { id: "voor-jou-1", title: "Voor Jou", theme: "personal", image: "images/offers/personal.svg", shortDesc: "Tailored for your usage", fullDescription: "A personalized bundle based on your data and calling patterns. Includes extra data rollover and weekend unlimited calls." },
@@ -34,7 +34,7 @@ const ZAPZAP_USERS = [
     id: 10003,
     name: "Sam Chen",
     usage: { dataGB: 45.2, minutes: 45, sms: 12 },
-    planType: "Data Max",
+    planType: "family",
     subscriptions: ["Spotify Premium", "YouTube Premium", "Cloud Storage 200GB"],
     offers: [
       { id: "voor-jou-3", title: "Voor Jou", theme: "personal", image: "images/offers/personal.svg", shortDesc: "Data-first experience", fullDescription: "Optimized for heavy data users. Priority speed and unlimited social data." },
