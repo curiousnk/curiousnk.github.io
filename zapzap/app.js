@@ -1,5 +1,6 @@
 (function () {
   const userSelect = document.getElementById("userSelect");
+  const offerTypeSelect = document.getElementById("offerTypeSelect");
   const heroGreeting = document.getElementById("heroGreeting");
   const heroUser = document.getElementById("heroUser");
   const profileInitial = document.getElementById("profileInitial");
@@ -12,8 +13,13 @@
   const modalBody = document.getElementById("modalBody");
   const modalClose = document.getElementById("modalClose");
 
-  // Must match the surface name configured in AJO for the ranking-formula offer (where we render AJO carousel)
-  const AJO_SURFACE = "web://curiousnk.github.io/zapzap/index.html#carouselAJO";
+  // AJO surfaces: one per offer type. Replace placeholder URLs when you create the 4 surfaces in AJO.
+  const AJO_SURFACES = {
+    priority: "web://curiousnk.github.io/zapzap/index.html#carouselAJO",
+    ranking: "web://curiousnk.github.io/zapzap/index.html#carouselAJORanking",
+    aiAuto: "web://curiousnk.github.io/zapzap/index.html#carouselAJOAIAuto",
+    customAi: "web://curiousnk.github.io/zapzap/index.html#carouselAJOCustomAI"
+  };
 
   let currentUser = null;
 
@@ -35,15 +41,21 @@
     return txt.value;
   }
 
-  function requestAJOOffers(user) {
+  function getAJOOfferType() {
+    return offerTypeSelect ? offerTypeSelect.value : "priority";
+  }
+
+  function requestAJOOffers(user, offerType) {
     if (!carouselAJO || typeof alloy !== "function") return;
+    offerType = offerType || getAJOOfferType();
+    var surface = AJO_SURFACES[offerType] || AJO_SURFACES.priority;
     carouselAJO.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
     var telcocoId = String(user.id);
 
     alloy("sendEvent", {
       renderDecisions: false,
       personalization: {
-        surfaces: [AJO_SURFACE]
+        surfaces: [surface]
       },
       xdm: {
         eventType: "decisioning.request",
@@ -219,10 +231,18 @@
     renderUsageCard(currentUser);
     renderCarousel(carouselAI, getOffersInOrder(currentUser, "aiOrder"), currentUser);
     if (typeof alloy === "function") {
-      requestAJOOffers(currentUser);
+      requestAJOOffers(currentUser, getAJOOfferType());
     } else {
       if (carouselAJO) carouselAJO.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
     }
+  }
+
+  if (offerTypeSelect) {
+    offerTypeSelect.addEventListener("change", function () {
+      if (currentUser && typeof alloy === "function") {
+        requestAJOOffers(currentUser, offerTypeSelect.value);
+      }
+    });
   }
 
   profileBtn.addEventListener("click", function () {

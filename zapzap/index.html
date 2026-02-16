@@ -68,10 +68,23 @@
       </div>
     </section>
 
-    <!-- Carousel: AJO ranking formula -->
+    <!-- Carousel: AJO (surface chosen by offer-type switch) -->
     <section class="offers-section">
-      <h2 class="section-title section-title-accent">Ranked by AJO formula</h2>
-      <p class="section-subtitle">Offers ordered by ranking formula in Adobe Journey Optimizer</p>
+      <div class="offers-section-head">
+        <div>
+          <h2 class="section-title section-title-accent">Offers from AJO</h2>
+          <p class="section-subtitle" id="ajoSectionSubtitle">Select offer type below</p>
+        </div>
+        <label class="offer-type-label">
+          Offer type
+          <select id="offerTypeSelect" class="profile-select" aria-label="Offer type">
+            <option value="priority">Priority based</option>
+            <option value="ranking">Ranking formula based</option>
+            <option value="aiAuto">AI Auto model</option>
+            <option value="customAi">Custom AI model</option>
+          </select>
+        </label>
+      </div>
       <div class="carousel-wrap">
         <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="ajo" aria-label="Previous">‹</button>
         <div class="carousel" id="carouselAJO" data-carousel="ajo">

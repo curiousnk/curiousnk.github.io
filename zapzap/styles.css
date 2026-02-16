@@ -247,6 +247,27 @@ body {
   border-radius: var(--radius);
 }
 
+.offers-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.offer-type-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.offer-type-label .profile-select {
+  min-width: 10rem;
+}
+
 .offers-section .section-title {
   font-size: 1.15rem;
   font-weight: 700;
