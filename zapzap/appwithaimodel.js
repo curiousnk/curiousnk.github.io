@@ -1,213 +1,262 @@
-const apiKey = "f3ba18f27e453b29a6b79158e9071041";
+(function () {
+  const SURFACE = "web://curiousnk.github.io/zapzap/index.html#offerContainer";
+  const heroGreeting = document.getElementById("heroGreeting");
+  const heroUser = document.getElementById("heroUser");
+  const profileInitial = document.getElementById("profileInitial");
+  const profileBtn = document.getElementById("profileBtn");
+  const userSelect = document.getElementById("userSelect");
+  const usageCard = document.getElementById("usageCard");
+  const offerContainer = document.getElementById("offerContainer");
 
-// DELTA: Removed waitForAlloy wrapper - now calling geolocation directly
-navigator.geolocation.getCurrentPosition(pos => {
-  const lat = pos.coords.latitude;
-  const lon = pos.coords.longitude;
+  let currentUser = null;
 
-  fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`)
-    .then(res => res.json())
-    .then(data => {
-      // DELTA: Use actual temperature instead of hardcoded 70
-      const temp = Math.round(data.main.temp);
-      const condition = data.weather[0].main;
-      const city = data.name;
-      // DELTA: Removed humidity variable (not used in new code)
+  function waitForAlloy(callback, interval, retries) {
+    interval = interval || 100;
+    retries = retries || 50;
+    if (typeof alloy === "function") {
+      callback();
+    } else if (retries > 0) {
+      setTimeout(function () { waitForAlloy(callback, interval, retries - 1); }, interval);
+    } else {
+      console.error("Alloy is not available.");
+    }
+  }
 
-      document.getElementById("weatherStatus").textContent =
-        `Current temperature in ${city} is ${temp}°F with ${condition}.`;
+  function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html || "";
+    return txt.value;
+  }
 
-      // DELTA: Changed renderDecisions from false to true
-      alloy("sendEvent", {
-        renderDecisions: true,
-        personalization: {
-          surfaces: [
-            "web://curiousnk.github.io/weather/index.html#offerContainer"
-          ]
-        },
-        xdm: {
-          eventType: "decisioning.request",
-          _psc: {
-            temperature: temp,
-            weatherConditions: condition,
-            cityName: city
-          }
+  function getGreeting() {
+    var h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
+    return "Good evening";
+  }
+
+  function getInitials(name) {
+    return name.split(" ").map(function (s) { return s.charAt(0); }).join("").toUpperCase().slice(0, 2);
+  }
+
+  function shortName(name) {
+    var parts = name.split(" ");
+    if (parts.length >= 2) return parts[0].charAt(0) + ". " + parts[1];
+    return name;
+  }
+
+  function updateHero(user) {
+    if (heroGreeting) heroGreeting.textContent = getGreeting();
+    if (heroUser) heroUser.textContent = shortName(user.name);
+    if (profileInitial) profileInitial.textContent = getInitials(user.name);
+  }
+
+  function renderUsageCard(user) {
+    if (!usageCard) return;
+    usageCard.innerHTML =
+      '<div class="usage-card-icon">🌤️</div>' +
+      '<div class="usage-card-main">' +
+      '<p class="usage-card-label">Your weather</p>' +
+      '<p class="usage-card-value">' + user.temperature + '°F, ' + user.weatherConditions + '</p>' +
+      '<p class="usage-card-plan">' + user.cityName + '</p>' +
+      '</div>';
+  }
+
+  function renderUserOptions() {
+    if (!userSelect || typeof ZAPZAP_USERS === "undefined") return;
+    userSelect.innerHTML = ZAPZAP_USERS.map(function (u) {
+      return '<option value="' + u.id + '">' + u.name + '</option>';
+    }).join("");
+  }
+
+  function updateCarouselButtons(carouselEl) {
+    if (!carouselEl) return;
+    var wrap = carouselEl.closest(".carousel-wrap");
+    if (!wrap) return;
+    var prevBtn = wrap.querySelector(".carousel-btn-prev");
+    var nextBtn = wrap.querySelector(".carousel-btn-next");
+    var maxScroll = carouselEl.scrollWidth - carouselEl.clientWidth;
+    if (prevBtn) prevBtn.disabled = maxScroll <= 0 || carouselEl.scrollLeft <= 0;
+    if (nextBtn) nextBtn.disabled = maxScroll <= 0 || carouselEl.scrollLeft >= maxScroll - 1;
+  }
+
+  function requestOffers(user) {
+    if (!offerContainer || typeof alloy !== "function") return;
+    offerContainer.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+    updateCarouselButtons(offerContainer);
+
+    alloy("sendEvent", {
+      renderDecisions: true,
+      personalization: { surfaces: [SURFACE] },
+      xdm: {
+        eventType: "decisioning.request",
+        _psc: {
+          userId: user.id,
+          temperature: user.temperature,
+          weatherConditions: user.weatherConditions,
+          cityName: user.cityName
         }
-      }).then(response => {
-        const offerDiv = document.getElementById("offerContainer");
-        offerDiv.innerHTML = "";
-        // DELTA: Store propositions globally for tracking events
-        window.latestPropositions = response.propositions || [];
+      }
+    }).then(function (response) {
+      offerContainer.innerHTML = "";
+      window.latestPropositions = response.propositions || [];
+      var allOffers = [];
+      (response.propositions || []).forEach(function (p) {
+        allOffers = allOffers.concat(p.items || []);
+      });
 
-        const allOffers = [];
+      if (!allOffers.length) {
+        offerContainer.innerHTML = "<p class=\"carousel-message\">No AJO offers returned.</p>";
+        updateCarouselButtons(offerContainer);
+        return;
+      }
 
-        (response.propositions || []).forEach(p => {
-          allOffers.push(...(p.items || []));
-        });
-
-        // DELTA: Updated message text
-        if (!allOffers.length) {
-          offerDiv.innerHTML = "<p>No AJO offers returned.</p>";
-          return;
-        }
-
-        // DELTA: Extract tokens from subPropositions (base64 encoded) - build token map by index
-        const tokensByIndex = [];
-        (response.propositions || []).forEach(proposition => {
-          try {
-            if (proposition.scopeDetails?.characteristics?.subPropositions) {
-              const decoded = atob(proposition.scopeDetails.characteristics.subPropositions);
-              const subProps = JSON.parse(decoded);
-              if (Array.isArray(subProps) && subProps.length > 0) {
-                subProps.forEach(subProp => {
-                  if (subProp.items && Array.isArray(subProp.items)) {
-                    subProp.items.forEach(subItem => {
-                      if (subItem.token) {
-                        tokensByIndex.push(subItem.token);
-                      }
-                    });
-                  }
-                });
-              }
-            }
-          } catch (e) {
-            console.warn("Failed to decode subPropositions:", e);
-          }
-        });
-
-        // DELTA: Added impressionItems array to track offers for impression events
-        const impressionItems = [];
-
-        allOffers.forEach((item, itemIndex) => {
-          // DELTA: Extract offerId from item and token from subPropositions by index
-          const offerId = item.id;
-          const trackingToken = tokensByIndex[itemIndex] || item.token;
-
-          if (offerId && trackingToken) {
-            impressionItems.push({ id: offerId, token: trackingToken });
-          }
-
-          const decoded = decodeHtml(item.data?.content || "");
-          const tempDiv = document.createElement("div");
-          tempDiv.innerHTML = decoded;
-
-          // DELTA: Enhanced offer rendering with tracking token extraction
-          [...tempDiv.children].forEach(child => {
-            if (child.classList.contains("offer-item")) {
-              offerDiv.appendChild(child);
-
-              // DELTA: Added click tracking for offer interactions
-              child.querySelectorAll("a, button").forEach(el => {
-                el.addEventListener("click", () => {
-                  const ecidValue = getECID();
-                  if (!ecidValue || !offerId || !trackingToken) {
-                    console.warn("Missing ECID, offerId, or trackingToken. Interaction event not sent !!!");
-                    return;
-                  }
-
-                  alloy("sendEvent", {
-                    xdm: {
-                      _id: generateUUID(),
-                      timestamp: new Date().toISOString(),
-                      eventType: "decisioning.propositionInteract",
-                      identityMap: {
-                        ECID: [{
-                          id: ecidValue,
-                          authenticatedState: "ambiguous",
-                          primary: true
-                        }]
-                      },
-                      _experience: {
-                        decisioning: {
-                          propositionEventType: {
-                            interact: 1
-                          },
-                          propositionAction: {
-                            id: offerId,
-                            tokens: [trackingToken]
-                          },
-                          propositions: window.latestPropositions
-                        }
-                      }
-                    }
+      var tokensByIndex = [];
+      (response.propositions || []).forEach(function (proposition) {
+        try {
+          if (proposition.scopeDetails && proposition.scopeDetails.characteristics && proposition.scopeDetails.characteristics.subPropositions) {
+            var decoded = atob(proposition.scopeDetails.characteristics.subPropositions);
+            var subProps = JSON.parse(decoded);
+            if (Array.isArray(subProps) && subProps.length > 0) {
+              subProps.forEach(function (subProp) {
+                if (subProp.items && Array.isArray(subProp.items)) {
+                  subProp.items.forEach(function (subItem) {
+                    if (subItem.token) tokensByIndex.push(subItem.token);
                   });
-                });
+                }
               });
             }
-          });
-        });
-
-        // DELTA: Added impression event tracking after rendering
-        if (impressionItems.length > 0) {
-          const ecidValue = getECID();
-          if (!ecidValue) {
-            console.warn("Girish Missing ECID. Skipping impression.");
-            return;
           }
+        } catch (e) {
+          console.warn("Failed to decode subPropositions:", e);
+        }
+      });
 
-          // Send impression for each item
-          impressionItems.forEach(({ id, token }) => {
-            if (!id || !token) {
-              console.warn("Girish Missing offerId or trackingToken. Skipping impression.");
-              return;
-            }
+      var impressionItems = [];
+      allOffers.forEach(function (item, itemIndex) {
+        var offerId = item.id;
+        var trackingToken = tokensByIndex[itemIndex] || item.token;
+        if (offerId && trackingToken) impressionItems.push({ id: offerId, token: trackingToken });
 
-            alloy("sendEvent", {
-              xdm: {
-                _id: generateUUID(),
-                timestamp: new Date().toISOString(),
-                eventType: "decisioning.propositionDisplay",
-                identityMap: {
-                  ECID: [{
-                    id: ecidValue,
-                    authenticatedState: "ambiguous",
-                    primary: true
-                  }]
-                },
-                _experience: {
-                  decisioning: {
-                    propositionEventType: {
-                      display: 1
-                    },
-                    propositionAction: {
-                      id: id,
-                      tokens: [token]
-                    },
-                    propositions: window.latestPropositions
+        var decoded = decodeHtml(item.data && item.data.content ? item.data.content : "");
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = decoded;
+        [].slice.call(tempDiv.children).forEach(function (child) {
+          if (child.classList.contains("offer-item")) {
+            offerContainer.appendChild(child);
+            child.querySelectorAll("a, button").forEach(function (el) {
+              el.addEventListener("click", function () {
+                var ecidValue = getECID();
+                if (!ecidValue || !offerId || !trackingToken) return;
+                alloy("sendEvent", {
+                  xdm: {
+                    _id: generateUUID(),
+                    timestamp: new Date().toISOString(),
+                    eventType: "decisioning.propositionInteract",
+                    identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
+                    _experience: {
+                      decisioning: {
+                        propositionEventType: { interact: 1 },
+                        propositionAction: { id: offerId, tokens: [trackingToken] },
+                        propositions: window.latestPropositions
+                      }
+                    }
                   }
+                });
+              });
+            });
+          }
+        });
+      });
+
+      offerContainer.scrollLeft = 0;
+      updateCarouselButtons(offerContainer);
+
+      if (impressionItems.length > 0) {
+        var ecidValue = getECID();
+        if (!ecidValue) return;
+        impressionItems.forEach(function (_ref) {
+          var id = _ref.id, token = _ref.token;
+          if (!id || !token) return;
+          alloy("sendEvent", {
+            xdm: {
+              _id: generateUUID(),
+              timestamp: new Date().toISOString(),
+              eventType: "decisioning.propositionDisplay",
+              identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
+              _experience: {
+                decisioning: {
+                  propositionEventType: { display: 1 },
+                  propositionAction: { id: id, tokens: [token] },
+                  propositions: window.latestPropositions
                 }
               }
-            });
+            }
           });
-        }
-      }).catch(err => {
-        console.error("❌ Personalization failed:", err);
-      });
-    })
-    .catch(error => {
-      console.error("Failed to fetch weather data:", error);
+        });
+      }
+    }).catch(function (err) {
+      console.error("Personalization failed:", err);
+      offerContainer.innerHTML = "<p class=\"carousel-message\">No offers returned.</p>";
+      updateCarouselButtons(offerContainer);
     });
-});
-
-function decodeHtml(html) {
-  const txt = document.createElement("textarea");
-  txt.innerHTML = html;
-  return txt.value;
-}
-
-// DELTA: Added generateUUID function for event tracking
-function generateUUID() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  );
-}
-
-// DELTA: Added getECID function to retrieve ECID from _satellite
-function getECID() {
-  try {
-    return _satellite.getVar("ECID");
-  } catch (e) {
-    console.warn("ECID not available via _satellite.");
-    return null;
   }
-}
+
+  function switchUser(userId) {
+    var user = ZAPZAP_USERS.filter(function (u) { return u.id === parseInt(userId, 10); })[0];
+    if (!user) return;
+    currentUser = user;
+    updateHero(currentUser);
+    renderUsageCard(currentUser);
+    if (typeof alloy === "function") {
+      requestOffers(currentUser);
+    } else {
+      offerContainer.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+    }
+  }
+
+  function generateUUID() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, function (c) {
+      var r = (typeof crypto !== "undefined" && crypto.getRandomValues)
+        ? crypto.getRandomValues(new Uint8Array(1))[0] & 15
+        : (Math.random() * 16) | 0;
+      return (parseInt(c, 10) ^ r).toString(16);
+    });
+  }
+
+  function getECID() {
+    try {
+      return typeof _satellite !== "undefined" && _satellite.getVar ? _satellite.getVar("ECID") : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  renderUserOptions();
+  currentUser = ZAPZAP_USERS && ZAPZAP_USERS[0] ? ZAPZAP_USERS[0] : null;
+  if (currentUser) {
+    updateHero(currentUser);
+    renderUsageCard(currentUser);
+  }
+
+  if (profileBtn) profileBtn.addEventListener("click", function () {
+    if (userSelect) { userSelect.focus(); userSelect.click(); }
+  });
+  if (userSelect) userSelect.addEventListener("change", function () {
+    switchUser(this.value);
+  });
+
+  document.querySelectorAll(".carousel-wrap").forEach(function (wrap) {
+    var car = wrap.querySelector(".carousel");
+    if (!car) return;
+    var prevBtn = wrap.querySelector(".carousel-btn-prev");
+    var nextBtn = wrap.querySelector(".carousel-btn-next");
+    if (prevBtn) prevBtn.addEventListener("click", function () { car.scrollBy({ left: -300, behavior: "smooth" }); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { car.scrollBy({ left: 300, behavior: "smooth" }); });
+    car.addEventListener("scroll", function () { updateCarouselButtons(car); });
+  });
+
+  waitForAlloy(function () {
+    if (currentUser) requestOffers(currentUser);
+  });
+})();
