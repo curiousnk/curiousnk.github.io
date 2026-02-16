@@ -1,5 +1,5 @@
 (function () {
-  const SURFACE = "web://curiousnk.github.io/index.html#offerContainer";
+  const SURFACE = "web://curiousnk.github.io/weather/index.html#offerContainer";
   const heroGreeting = document.getElementById("heroGreeting");
   const heroUser = document.getElementById("heroUser");
   const profileInitial = document.getElementById("profileInitial");
