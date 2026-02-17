@@ -1,14 +1,28 @@
 (function () {
-  const SURFACE = "web://curiousnk.github.io/weather/index.html#offerContainer";
+  const BASE_URL = "web://curiousnk.github.io/weather/index.html";
+  const CAROUSEL_SURFACES = [
+    BASE_URL + "#offerContainer",
+    BASE_URL + "#offerContainerPriority",
+    BASE_URL + "#offerContainerAutoAI"
+  ];
+  const CAROUSEL_CONTAINER_IDS = ["offerContainerRanking", "offerContainerPriority", "offerContainerAutoAI"];
+  const CUSTOM_AI_CONTAINER_ID = "offerContainerCustomAI";
+  // Map proposition scope (surface URL) to container ID: #offerContainer = ranking, etc.
+  const SCOPE_TO_CONTAINER = {
+    [BASE_URL + "#offerContainer"]: "offerContainerRanking",
+    [BASE_URL + "#offerContainerPriority"]: "offerContainerPriority",
+    [BASE_URL + "#offerContainerAutoAI"]: "offerContainerAutoAI"
+  };
+
   const heroGreeting = document.getElementById("heroGreeting");
   const heroUser = document.getElementById("heroUser");
   const profileInitial = document.getElementById("profileInitial");
   const profileBtn = document.getElementById("profileBtn");
   const userSelect = document.getElementById("userSelect");
   const usageCard = document.getElementById("usageCard");
-  const offerContainer = document.getElementById("offerContainer");
 
   let currentUser = null;
+  window.carouselPropositions = {};
 
   function waitForAlloy(callback, interval, retries) {
     interval = interval || 100;
@@ -58,6 +72,8 @@
       '<div class="usage-card-main">' +
       '<p class="usage-card-label">Your weather</p>' +
       '<p class="usage-card-value">' + user.temperature + '°F, ' + user.weatherConditions + '</p>' +
+      '<p class="usage-card-label">Your plan</p>' +
+      '<p class="usage-card-plan">' + user.planType + '</p>' +
       '<p class="usage-card-plan">' + user.cityName + '</p>' +
       '</div>';
   }
@@ -80,130 +96,168 @@
     if (nextBtn) nextBtn.disabled = maxScroll <= 0 || carouselEl.scrollLeft >= maxScroll - 1;
   }
 
+  function getTokensFromProposition(proposition) {
+    var tokensByIndex = [];
+    try {
+      if (proposition.scopeDetails && proposition.scopeDetails.characteristics && proposition.scopeDetails.characteristics.subPropositions) {
+        var decoded = atob(proposition.scopeDetails.characteristics.subPropositions);
+        var subProps = JSON.parse(decoded);
+        if (Array.isArray(subProps) && subProps.length > 0) {
+          subProps.forEach(function (subProp) {
+            if (subProp.items && Array.isArray(subProp.items)) {
+              subProp.items.forEach(function (subItem) {
+                if (subItem.token) tokensByIndex.push(subItem.token);
+              });
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to decode subPropositions:", e);
+    }
+    return tokensByIndex;
+  }
+
+  function renderPropositionIntoContainer(containerEl, proposition, containerId) {
+    if (!containerEl) return;
+    containerEl.innerHTML = "";
+    window.carouselPropositions[containerId] = proposition;
+    var allOffers = proposition.items || [];
+    if (!allOffers.length) {
+      containerEl.innerHTML = "<p class=\"carousel-message\">No offers returned.</p>";
+      updateCarouselButtons(containerEl);
+      return;
+    }
+    var tokensByIndex = getTokensFromProposition(proposition);
+    var impressionItems = [];
+    var propositionForEvents = [proposition];
+    allOffers.forEach(function (item, itemIndex) {
+      var offerId = item.id;
+      var trackingToken = tokensByIndex[itemIndex] || item.token;
+      if (offerId && trackingToken) impressionItems.push({ id: offerId, token: trackingToken });
+      var decoded = decodeHtml(item.data && item.data.content ? item.data.content : "");
+      var tempDiv = document.createElement("div");
+      tempDiv.innerHTML = decoded;
+      [].slice.call(tempDiv.children).forEach(function (child) {
+        if (child.classList.contains("offer-item")) {
+          containerEl.appendChild(child);
+          child.querySelectorAll("a, button").forEach(function (el) {
+            el.addEventListener("click", function () {
+              var ecidValue = getECID();
+              if (!ecidValue || !offerId || !trackingToken) return;
+              alloy("sendEvent", {
+                xdm: {
+                  _id: generateUUID(),
+                  timestamp: new Date().toISOString(),
+                  eventType: "decisioning.propositionInteract",
+                  identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
+                  _experience: {
+                    decisioning: {
+                      propositionEventType: { interact: 1 },
+                      propositionAction: { id: offerId, tokens: [trackingToken] },
+                      propositions: propositionForEvents
+                    }
+                  }
+                }
+              });
+            });
+          });
+        }
+      });
+    });
+    containerEl.scrollLeft = 0;
+    updateCarouselButtons(containerEl);
+    var ecidValue = getECID();
+    if (ecidValue && impressionItems.length > 0) {
+      impressionItems.forEach(function (_ref) {
+        var id = _ref.id, token = _ref.token;
+        if (!id || !token) return;
+        alloy("sendEvent", {
+          xdm: {
+            _id: generateUUID(),
+            timestamp: new Date().toISOString(),
+            eventType: "decisioning.propositionDisplay",
+            identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
+            _experience: {
+              decisioning: {
+                propositionEventType: { display: 1 },
+                propositionAction: { id: id, tokens: [token] },
+                propositions: propositionForEvents
+              }
+            }
+          }
+        });
+      });
+    }
+  }
+
   function requestOffers(user) {
-    if (!offerContainer || typeof alloy !== "function") return;
-    offerContainer.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
-    updateCarouselButtons(offerContainer);
+    if (typeof alloy !== "function") return;
+    var i, containerEl;
+    for (i = 0; i < CAROUSEL_CONTAINER_IDS.length; i++) {
+      containerEl = document.getElementById(CAROUSEL_CONTAINER_IDS[i]);
+      if (containerEl) containerEl.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+    }
+    containerEl = document.getElementById(CUSTOM_AI_CONTAINER_ID);
+    if (containerEl) containerEl.innerHTML = "<p class=\"carousel-message\">Coming soon</p>";
+    document.querySelectorAll(".carousel-wrap").forEach(function (wrap) {
+      var car = wrap.querySelector(".carousel");
+      if (car) updateCarouselButtons(car);
+    });
 
     alloy("sendEvent", {
       renderDecisions: true,
-      personalization: { surfaces: [SURFACE] },
+      personalization: { surfaces: CAROUSEL_SURFACES },
       xdm: {
         eventType: "decisioning.request",
         _psc: {
-          userId: user.id,
+          id: user.id,
           temperature: user.temperature,
+          planType: user.planType,
           weatherConditions: user.weatherConditions,
           cityName: user.cityName
         }
       }
     }).then(function (response) {
-      offerContainer.innerHTML = "";
       window.latestPropositions = response.propositions || [];
-      var allOffers = [];
-      (response.propositions || []).forEach(function (p) {
-        allOffers = allOffers.concat(p.items || []);
-      });
-
-      if (!allOffers.length) {
-        offerContainer.innerHTML = "<p class=\"carousel-message\">No AJO offers returned.</p>";
-        updateCarouselButtons(offerContainer);
-        return;
-      }
-
-      var tokensByIndex = [];
+      var renderedContainerIds = {};
       (response.propositions || []).forEach(function (proposition) {
-        try {
-          if (proposition.scopeDetails && proposition.scopeDetails.characteristics && proposition.scopeDetails.characteristics.subPropositions) {
-            var decoded = atob(proposition.scopeDetails.characteristics.subPropositions);
-            var subProps = JSON.parse(decoded);
-            if (Array.isArray(subProps) && subProps.length > 0) {
-              subProps.forEach(function (subProp) {
-                if (subProp.items && Array.isArray(subProp.items)) {
-                  subProp.items.forEach(function (subItem) {
-                    if (subItem.token) tokensByIndex.push(subItem.token);
-                  });
-                }
-              });
-            }
-          }
-        } catch (e) {
-          console.warn("Failed to decode subPropositions:", e);
+        var scope = proposition.scope || (proposition.scopeDetails && proposition.scopeDetails.name);
+        var containerId = scope ? SCOPE_TO_CONTAINER[scope] : null;
+        if (!containerId) return;
+        containerEl = document.getElementById(containerId);
+        if (containerEl) {
+          renderPropositionIntoContainer(containerEl, proposition, containerId);
+          renderedContainerIds[containerId] = true;
         }
       });
-
-      var impressionItems = [];
-      allOffers.forEach(function (item, itemIndex) {
-        var offerId = item.id;
-        var trackingToken = tokensByIndex[itemIndex] || item.token;
-        if (offerId && trackingToken) impressionItems.push({ id: offerId, token: trackingToken });
-
-        var decoded = decodeHtml(item.data && item.data.content ? item.data.content : "");
-        var tempDiv = document.createElement("div");
-        tempDiv.innerHTML = decoded;
-        [].slice.call(tempDiv.children).forEach(function (child) {
-          if (child.classList.contains("offer-item")) {
-            offerContainer.appendChild(child);
-            child.querySelectorAll("a, button").forEach(function (el) {
-              el.addEventListener("click", function () {
-                var ecidValue = getECID();
-                if (!ecidValue || !offerId || !trackingToken) return;
-                alloy("sendEvent", {
-                  xdm: {
-                    _id: generateUUID(),
-                    timestamp: new Date().toISOString(),
-                    eventType: "decisioning.propositionInteract",
-                    identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
-                    _experience: {
-                      decisioning: {
-                        propositionEventType: { interact: 1 },
-                        propositionAction: { id: offerId, tokens: [trackingToken] },
-                        propositions: window.latestPropositions
-                      }
-                    }
-                  }
-                });
-              });
-            });
-          }
-        });
+      CAROUSEL_CONTAINER_IDS.forEach(function (id) {
+        if (renderedContainerIds[id]) return;
+        containerEl = document.getElementById(id);
+        if (containerEl) {
+          containerEl.innerHTML = "<p class=\"carousel-message\">No offers returned.</p>";
+          updateCarouselButtons(containerEl);
+        }
       });
-
-      offerContainer.scrollLeft = 0;
-      updateCarouselButtons(offerContainer);
-
-      if (impressionItems.length > 0) {
-        var ecidValue = getECID();
-        if (!ecidValue) return;
-        impressionItems.forEach(function (_ref) {
-          var id = _ref.id, token = _ref.token;
-          if (!id || !token) return;
-          alloy("sendEvent", {
-            xdm: {
-              _id: generateUUID(),
-              timestamp: new Date().toISOString(),
-              eventType: "decisioning.propositionDisplay",
-              identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
-              _experience: {
-                decisioning: {
-                  propositionEventType: { display: 1 },
-                  propositionAction: { id: id, tokens: [token] },
-                  propositions: window.latestPropositions
-                }
-              }
-            }
-          });
-        });
+      containerEl = document.getElementById(CUSTOM_AI_CONTAINER_ID);
+      if (containerEl) {
+        containerEl.innerHTML = "<p class=\"carousel-message\">Coming soon</p>";
+        updateCarouselButtons(containerEl);
       }
     }).catch(function (err) {
       console.error("Personalization failed:", err);
-      offerContainer.innerHTML = "<p class=\"carousel-message\">No offers returned.</p>";
-      updateCarouselButtons(offerContainer);
+      for (i = 0; i < CAROUSEL_CONTAINER_IDS.length; i++) {
+        containerEl = document.getElementById(CAROUSEL_CONTAINER_IDS[i]);
+        if (containerEl) {
+          containerEl.innerHTML = "<p class=\"carousel-message\">No offers returned.</p>";
+          updateCarouselButtons(containerEl);
+        }
+      }
     });
   }
 
   function switchUser(userId) {
-    var user = ZAPZAP_USERS.filter(function (u) { return u.id === parseInt(userId, 10); })[0];
+    var user = ZAPZAP_USERS.filter(function (u) { return String(u.id) === String(userId); })[0];
     if (!user) return;
     currentUser = user;
     updateHero(currentUser);
@@ -211,7 +265,10 @@
     if (typeof alloy === "function") {
       requestOffers(currentUser);
     } else {
-      offerContainer.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+      CAROUSEL_CONTAINER_IDS.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = "<p class=\"carousel-message\">Loading…</p>";
+      });
     }
   }
 

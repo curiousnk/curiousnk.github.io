@@ -43,14 +43,41 @@
     </section>
 
     <section class="offers-section">
-      <h2 class="section-title section-title-accent">Offers for you</h2>
-      <p class="section-subtitle">Personalized by your weather context</p>
+      <h2 class="section-title section-title-accent">Ranking formula</h2>
+      <p class="section-subtitle">Offers ordered by ranking formula</p>
       <div class="carousel-wrap">
-        <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="offers" aria-label="Previous">‹</button>
-        <div class="carousel" id="offerContainer" data-carousel="offers">
-          <!-- filled by JS from AJO -->
+        <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="ranking" aria-label="Previous">‹</button>
+        <div class="carousel" id="offerContainerRanking" data-carousel="ranking"></div>
+        <button type="button" class="carousel-btn carousel-btn-next" data-carousel="ranking" aria-label="Next">›</button>
+      </div>
+    </section>
+    <section class="offers-section">
+      <h2 class="section-title section-title-accent">Priority based</h2>
+      <p class="section-subtitle">Offers by priority rules</p>
+      <div class="carousel-wrap">
+        <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="priority" aria-label="Previous">‹</button>
+        <div class="carousel" id="offerContainerPriority" data-carousel="priority"></div>
+        <button type="button" class="carousel-btn carousel-btn-next" data-carousel="priority" aria-label="Next">›</button>
+      </div>
+    </section>
+    <section class="offers-section">
+      <h2 class="section-title section-title-accent">Auto AI model</h2>
+      <p class="section-subtitle">Offers by AI model</p>
+      <div class="carousel-wrap">
+        <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="autoAI" aria-label="Previous">‹</button>
+        <div class="carousel" id="offerContainerAutoAI" data-carousel="autoAI"></div>
+        <button type="button" class="carousel-btn carousel-btn-next" data-carousel="autoAI" aria-label="Next">›</button>
+      </div>
+    </section>
+    <section class="offers-section">
+      <h2 class="section-title section-title-accent">Custom AI</h2>
+      <p class="section-subtitle">Reserved for custom AI mode</p>
+      <div class="carousel-wrap">
+        <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="customAI" aria-label="Previous">‹</button>
+        <div class="carousel" id="offerContainerCustomAI" data-carousel="customAI">
+          <p class="carousel-message">Coming soon</p>
         </div>
-        <button type="button" class="carousel-btn carousel-btn-next" data-carousel="offers" aria-label="Next">›</button>
+        <button type="button" class="carousel-btn carousel-btn-next" data-carousel="customAI" aria-label="Next">›</button>
       </div>
     </section>
   </main>
