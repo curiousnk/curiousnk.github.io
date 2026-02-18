@@ -13,6 +13,8 @@
     [BASE_URL + "#offerContainerPriority"]: "offerContainerPriority",
     [BASE_URL + "#offerContainerAutoAI"]: "offerContainerAutoAI"
   };
+  // Only send propositionDisplay / propositionInteract for AI model training on this carousel
+  const AI_MODEL_CAROUSEL_CONTAINER_ID = "offerContainerAutoAI";
 
   const heroGreeting = document.getElementById("heroGreeting");
   const heroUser = document.getElementById("heroUser");
@@ -149,6 +151,32 @@
     return tokensByIndex;
   }
 
+  /** Returns [{ id, token }, ...] from proposition.scopeDetails.characteristics.subPropositions (by index). */
+  function getOfferIdsAndTokensFromProposition(proposition) {
+    var list = [];
+    try {
+      if (proposition.scopeDetails && proposition.scopeDetails.characteristics && proposition.scopeDetails.characteristics.subPropositions) {
+        var decoded = atob(proposition.scopeDetails.characteristics.subPropositions);
+        var subProps = JSON.parse(decoded);
+        if (Array.isArray(subProps) && subProps.length > 0) {
+          subProps.forEach(function (subProp) {
+            if (subProp.items && Array.isArray(subProp.items)) {
+              subProp.items.forEach(function (subItem) {
+                list.push({
+                  id: subItem.id || null,
+                  token: subItem.token || null
+                });
+              });
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to decode subPropositions:", e);
+    }
+    return list;
+  }
+
   function renderPropositionIntoContainer(containerEl, proposition, containerId) {
     if (!containerEl) return;
     containerEl.innerHTML = "";
@@ -160,65 +188,53 @@
       return;
     }
     var tokensByIndex = getTokensFromProposition(proposition);
-    var impressionItems = [];
+    var idsAndTokens = getOfferIdsAndTokensFromProposition(proposition);
     var propositionForEvents = [proposition];
+    var isAIModelCarousel = containerId === AI_MODEL_CAROUSEL_CONTAINER_ID;
+    var impressionItems = isAIModelCarousel ? idsAndTokens.filter(function (x) { return x.id && x.token; }) : [];
+    var offerIndex = 0;
     allOffers.forEach(function (item, itemIndex) {
       var offerId = item.id;
       var trackingToken = tokensByIndex[itemIndex] || item.token;
-      if (offerId && trackingToken) impressionItems.push({ id: offerId, token: trackingToken });
       var decoded = decodeHtml(item.data && item.data.content ? item.data.content : "");
       var tempDiv = document.createElement("div");
       tempDiv.innerHTML = decoded;
       [].slice.call(tempDiv.children).forEach(function (child) {
         if (child.classList.contains("offer-item")) {
+          if (isAIModelCarousel && idsAndTokens[offerIndex]) {
+            child.setAttribute("data-offer-id", idsAndTokens[offerIndex].id);
+            child.setAttribute("data-tracking-token", idsAndTokens[offerIndex].token);
+            offerIndex++;
+          }
           containerEl.appendChild(child);
-          child.querySelectorAll("a, button").forEach(function (el) {
-            el.addEventListener("click", function () {
-              var ecidValue = getECID();
-              if (!ecidValue || !offerId || !trackingToken) return;
-              alloy("sendEvent", {
-                xdm: {
-                  _id: generateUUID(),
-                  timestamp: new Date().toISOString(),
-                  eventType: "decisioning.propositionInteract",
-                  identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
-                  _experience: {
-                    decisioning: {
-                      propositionEventType: { interact: 1 },
-                      propositionAction: { id: offerId, tokens: [trackingToken] },
-                      propositions: propositionForEvents
-                    }
-                  }
-                }
-              });
-            });
-          });
         }
       });
     });
     containerEl.scrollLeft = 0;
     updateCarouselButtons(containerEl);
-    var ecidValue = getECID();
-    if (ecidValue && impressionItems.length > 0) {
-      impressionItems.forEach(function (_ref) {
-        var id = _ref.id, token = _ref.token;
-        if (!id || !token) return;
-        alloy("sendEvent", {
-          xdm: {
-            _id: generateUUID(),
-            timestamp: new Date().toISOString(),
-            eventType: "decisioning.propositionDisplay",
-            identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
-            _experience: {
-              decisioning: {
-                propositionEventType: { display: 1 },
-                propositionAction: { id: id, tokens: [token] },
-                propositions: propositionForEvents
+    if (isAIModelCarousel) {
+      var ecidValue = getECID();
+      if (ecidValue && impressionItems.length > 0) {
+        impressionItems.forEach(function (_ref) {
+          var id = _ref.id, token = _ref.token;
+          if (!id || !token) return;
+          alloy("sendEvent", {
+            xdm: {
+              _id: generateUUID(),
+              timestamp: new Date().toISOString(),
+              eventType: "decisioning.propositionDisplay",
+              identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
+              _experience: {
+                decisioning: {
+                  propositionEventType: { display: 1 },
+                  propositionAction: { id: id, tokens: [token] },
+                  propositions: propositionForEvents
+                }
               }
             }
-          }
+          });
         });
-      });
+      }
     }
   }
 
@@ -351,6 +367,31 @@
     if (e.target.closest(".btn-show-more")) {
       var card = e.target.closest(".offer-item");
       if (card && modalBody) {
+        var autoAIContainer = document.getElementById(AI_MODEL_CAROUSEL_CONTAINER_ID);
+        if (autoAIContainer && autoAIContainer.contains(card)) {
+          var offerId = card.getAttribute("data-offer-id");
+          var trackingToken = card.getAttribute("data-tracking-token");
+          var proposition = window.carouselPropositions && window.carouselPropositions[AI_MODEL_CAROUSEL_CONTAINER_ID];
+          var ecidValue = getECID();
+          if (ecidValue && offerId && trackingToken && proposition) {
+            console.log("AI Ranking even for auto model", offerId, trackingToken, proposition);  
+             alloy("sendEvent", {
+               xdm: {
+                 _id: generateUUID(),
+                 timestamp: new Date().toISOString(),
+                 eventType: "decisioning.propositionInteract",
+                 identityMap: { ECID: [{ id: ecidValue, authenticatedState: "ambiguous", primary: true }] },
+                 _experience: {
+                   decisioning: {
+                     propositionEventType: { interact: 1 },
+                     propositionAction: { id: offerId, tokens: [trackingToken] },
+                     propositions: [proposition]
+                   }
+                 }
+               }
+             });
+           }
+        }
         modalBody.innerHTML = "";
         modalBody.appendChild(card.querySelector(".offer-card").cloneNode(true));
         if (offerModal) { offerModal.classList.add("is-open"); offerModal.setAttribute("aria-hidden", "false"); }
