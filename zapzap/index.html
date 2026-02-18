@@ -8,38 +8,32 @@
 </head>
 <body>
   <header class="hero">
-    <div class="hero-inner">
-      <div class="hero-left">
-        <p class="hero-greeting" id="heroGreeting">Good evening</p>
-        <p class="hero-user" id="heroUser">Alex M.</p>
+    <div class="hero-left">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </span>
+        <span class="brand-name">ZapZap</span>
       </div>
-      <div class="hero-right">
-        <div class="profile-wrap">
-          <button type="button" class="profile-btn" id="profileBtn" aria-label="Switch user">
-            <span class="profile-initial" id="profileInitial">A</span>
-          </button>
-          <select id="userSelect" class="profile-select" aria-label="Switch user">
-            <!-- filled by JS -->
-          </select>
-        </div>
+    </div>
+    <div class="hero-center">
+      <p class="hero-greeting" id="heroGreeting">Good evening</p>
+      <p class="hero-user" id="heroUser">Alex M.</p>
+    </div>
+    <div class="hero-right">
+      <div class="profile-wrap">
+        <button type="button" class="profile-btn" id="profileBtn" aria-label="Switch user">
+          <span class="profile-initial" id="profileInitial">A</span>
+        </button>
+        <select id="userSelect" class="profile-select" aria-label="Switch user">
+          <!-- filled by JS -->
+        </select>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- <nav class="quick-actions" aria-label="Quick actions">
-      <a href="#" class="quick-action"><span class="quick-action-icon">🎁</span><span>Share data</span></a>
-      <a href="#" class="quick-action"><span class="quick-action-icon">📶</span><span>My network</span></a>
-      <a href="#" class="quick-action"><span class="quick-action-icon">📄</span><span>Invoices</span></a>
-    </nav> -->
-
-    <section class="dashboard-section" aria-label="My plan and usage">
-      <h2 class="dashboard-section-title">My plan & usage</h2>
-      <div class="dashboard-cards" id="dashboardCards">
-        <!-- filled by JS -->
-      </div>
-    </section>
-
+    <div class="main-content">
     <section class="offers-section">
       <h2 class="section-title section-title-accent">Ranking formula</h2>
       <p class="section-subtitle">Offers ordered by ranking formula</p>
@@ -78,7 +72,23 @@
         <button type="button" class="carousel-btn carousel-btn-next" data-carousel="customAI" aria-label="Next">›</button>
       </div>
     </section>
+    </div>
+    <aside class="sidebar" aria-label="My plan and usage">
+      <section class="dashboard-section">
+        <h2 class="dashboard-section-title">My plan & usage</h2>
+        <div class="dashboard-cards" id="dashboardCards">
+          <!-- filled by JS -->
+        </div>
+      </section>
+    </aside>
   </main>
+
+  <div class="modal-overlay" id="offerModal" aria-hidden="true">
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="modalClose" aria-label="Close">×</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
 
   <script src="https://assets.adobedtm.com/0fdf44e62125/e83d4391416e/launch-bad7a7174ca2-development.min.js" async></script>
   <script src="data.js"></script>

@@ -344,6 +344,25 @@
     car.addEventListener("scroll", function () { updateCarouselButtons(car); });
   });
 
+  var offerModal = document.getElementById("offerModal");
+  var modalBody = document.getElementById("modalBody");
+  var modalClose = document.getElementById("modalClose");
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(".btn-show-more")) {
+      var card = e.target.closest(".offer-item");
+      if (card && modalBody) {
+        modalBody.innerHTML = "";
+        modalBody.appendChild(card.querySelector(".offer-card").cloneNode(true));
+        if (offerModal) { offerModal.classList.add("is-open"); offerModal.setAttribute("aria-hidden", "false"); }
+      }
+    }
+  });
+  function closeModal() {
+    if (offerModal) { offerModal.classList.remove("is-open"); offerModal.setAttribute("aria-hidden", "true"); }
+  }
+  if (modalClose) modalClose.addEventListener("click", closeModal);
+  if (offerModal) offerModal.addEventListener("click", function (e) { if (e.target === offerModal) closeModal(); });
+
   waitForAlloy(function () {
     if (currentUser) requestOffers(currentUser);
   });
