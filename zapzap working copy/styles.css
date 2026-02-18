@@ -151,27 +151,22 @@ body {
   padding: 1.5rem 1.5rem 2rem;
 }
 
-.dashboard-section {
+.usage-section {
   margin-bottom: 1.75rem;
 }
 
-.dashboard-section-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
+.usage-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 0.75rem;
   padding: 0 0.25rem;
 }
 
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
-}
-
-.dashboard-card {
-  flex: 1;
-  min-width: 0;
+.usage-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--success);
 }
 
 .usage-card {

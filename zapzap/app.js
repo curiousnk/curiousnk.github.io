@@ -19,8 +19,7 @@
   const profileInitial = document.getElementById("profileInitial");
   const profileBtn = document.getElementById("profileBtn");
   const userSelect = document.getElementById("userSelect");
-  const usageCard = document.getElementById("usageCard");
-
+  const dashboardCards = document.getElementById("dashboardCards");
   let currentUser = null;
   window.carouselPropositions = {};
 
@@ -65,16 +64,48 @@
     if (profileInitial) profileInitial.textContent = getInitials(user.name);
   }
 
-  function renderUsageCard(user) {
-    if (!usageCard) return;
-    usageCard.innerHTML =
-      '<div class="usage-card-icon">🌤️</div>' +
-      '<div class="usage-card-main">' +
-      '<p class="usage-card-label">Your weather</p>' +
-      '<p class="usage-card-value">' + user.temperature + '°F, ' + user.weatherConditions + '</p>' +
-      '<p class="usage-card-label">Your plan</p>' +
-      '<p class="usage-card-plan">' + user.planType + '</p>' +
-      '<p class="usage-card-plan">' + user.cityName + '</p>' +
+  function renderDashboard(user) {
+    if (!dashboardCards) return;
+    var planLabel = user.planLabel || user.planType || "—";
+    var dataUsed = user.dataUsedGB != null ? user.dataUsedGB + " GB" : "—";
+    var dataLimit = user.dataLimitGB != null ? user.dataLimitGB + " GB" : "Unlimited";
+    var dataText = user.dataUsedGB != null ? dataUsed + " of " + dataLimit + " used" : "—";
+    var hasMinutes = user.minutesUsed != null || user.minutesLimit != null;
+    var minutesText = hasMinutes
+      ? (user.minutesUsed != null ? user.minutesUsed + " min" : "0 min") + " of " + (user.minutesLimit != null ? user.minutesLimit + " min" : "Unlimited") + " used"
+      : "Not included";
+    var hasSms = user.smsUsed != null || user.smsLimit != null;
+    var smsText = hasSms
+      ? (user.smsUsed != null ? user.smsUsed : "0") + " of " + (user.smsLimit != null ? user.smsLimit : "Unlimited") + " used"
+      : "Not included";
+    dashboardCards.innerHTML =
+      '<div class="dashboard-card usage-card">' +
+        '<div class="usage-card-icon">📱</div>' +
+        '<div class="usage-card-main">' +
+          '<p class="usage-card-label">Current plan</p>' +
+          '<p class="usage-card-value">' + planLabel + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dashboard-card usage-card">' +
+        '<div class="usage-card-icon">📶</div>' +
+        '<div class="usage-card-main">' +
+          '<p class="usage-card-label">Data this period</p>' +
+          '<p class="usage-card-value">' + dataText + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dashboard-card usage-card">' +
+        '<div class="usage-card-icon">📞</div>' +
+        '<div class="usage-card-main">' +
+          '<p class="usage-card-label">Minutes</p>' +
+          '<p class="usage-card-value">' + minutesText + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dashboard-card usage-card">' +
+        '<div class="usage-card-icon">💬</div>' +
+        '<div class="usage-card-main">' +
+          '<p class="usage-card-label">SMS</p>' +
+          '<p class="usage-card-value">' + smsText + '</p>' +
+        '</div>' +
       '</div>';
   }
 
@@ -261,7 +292,7 @@
     if (!user) return;
     currentUser = user;
     updateHero(currentUser);
-    renderUsageCard(currentUser);
+    renderDashboard(currentUser);
     if (typeof alloy === "function") {
       requestOffers(currentUser);
     } else {
@@ -293,7 +324,7 @@
   currentUser = ZAPZAP_USERS && ZAPZAP_USERS[0] ? ZAPZAP_USERS[0] : null;
   if (currentUser) {
     updateHero(currentUser);
-    renderUsageCard(currentUser);
+    renderDashboard(currentUser);
   }
 
   if (profileBtn) profileBtn.addEventListener("click", function () {

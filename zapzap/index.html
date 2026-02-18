@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZapZap – Weather-based offers</title>
+  <title>ZapZap – My offers</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -27,18 +27,16 @@
   </header>
 
   <main class="container">
-    <nav class="quick-actions" aria-label="Quick actions">
+    <!-- <nav class="quick-actions" aria-label="Quick actions">
       <a href="#" class="quick-action"><span class="quick-action-icon">🎁</span><span>Share data</span></a>
       <a href="#" class="quick-action"><span class="quick-action-icon">📶</span><span>My network</span></a>
       <a href="#" class="quick-action"><span class="quick-action-icon">📄</span><span>Invoices</span></a>
-    </nav>
+    </nav> -->
 
-    <section class="usage-section">
-      <div class="usage-section-head">
-        <h2 class="usage-section-title">Weather</h2>
-      </div>
-      <div class="usage-card" id="usageCard">
-        <!-- filled by JS from current user profile -->
+    <section class="dashboard-section" aria-label="My plan and usage">
+      <h2 class="dashboard-section-title">My plan & usage</h2>
+      <div class="dashboard-cards" id="dashboardCards">
+        <!-- filled by JS -->
       </div>
     </section>
 

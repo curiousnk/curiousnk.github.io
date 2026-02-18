@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZapZap – Weather-based offers</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <p class="hero-greeting" id="heroGreeting">Good evening</p>
+        <p class="hero-user" id="heroUser">Alex M.</p>
+      </div>
+      <div class="hero-right">
+        <div class="profile-wrap">
+          <button type="button" class="profile-btn" id="profileBtn" aria-label="Switch user">
+            <span class="profile-initial" id="profileInitial">A</span>
+          </button>
+          <select id="userSelect" class="profile-select" aria-label="Switch user">
+            <!-- filled by JS -->
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="quick-actions" aria-label="Quick actions">
+      <a href="#" class="quick-action"><span class="quick-action-icon">🎁</span><span>Share data</span></a>
+      <a href="#" class="quick-action"><span class="quick-action-icon">📶</span><span>My network</span></a>
+      <a href="#" class="quick-action"><span class="quick-action-icon">📄</span><span>Invoices</span></a>
+    </nav>
+
+    <section class="usage-section">
+      <div class="usage-section-head">
+        <h2 class="usage-section-title">Weather</h2>
+      </div>
+      <div class="usage-card" id="usageCard">
+        <!-- filled by JS from current user profile -->
+      </div>
+    </section>
+
+    <section class="offers-section">
+      <h2 class="section-title section-title-accent">Offers for you</h2>
+      <p class="section-subtitle">Personalized by your weather context</p>
+      <div class="carousel-wrap">
+        <button type="button" class="carousel-btn carousel-btn-prev" data-carousel="offers" aria-label="Previous">‹</button>
+        <div class="carousel" id="offerContainer" data-carousel="offers">
+          <!-- filled by JS from AJO -->
+        </div>
+        <button type="button" class="carousel-btn carousel-btn-next" data-carousel="offers" aria-label="Next">›</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://assets.adobedtm.com/0fdf44e62125/e83d4391416e/launch-bad7a7174ca2-development.min.js" async></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
