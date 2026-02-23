@@ -364,6 +364,10 @@ body {
   margin: 0;
 }
 
+.offers-section.is-hidden {
+  display: none;
+}
+
 .carousel::-webkit-scrollbar {
   height: 8px;
 }
